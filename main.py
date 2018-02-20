@@ -1,6 +1,4 @@
 import pyglet
-import sys
-from src.core.utils.functional import Vector
 
 pyglet.resource.path = ['assets']
 window = pyglet.window.Window()

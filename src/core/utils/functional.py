@@ -1,32 +1,72 @@
 import unittest
 
+"""
+A Library containing Functional utilis and types
+"""
+
 class Option:
+    """
+    A functional interface for performing operations on values that may or may not be present.
+    """
+
     def __init__(self, val):
+        """
+        Construct an Option type that contains methods that operate on the value if present or not.
+        :param val: The value to construct the Option around.
+        """
         self.__val = val
 
     def get(self):
+        """
+        Get the underlying value of the Option. 
+        :return: A value that may or may not be present.
+        """
         return self.__val
 
     def isPresent(self):
+        """
+        Query if the Option contains a Value.
+        :return: True if the Options value is not 'None'.
+        """
         return self.__val is not None
 
     def ifPresent(self, fn):
+        """
+        Invoke a function on the Option if the value is present.
+        :param fn: A fuction that accepts the present value.
+        :return: Void
+        """
         if self.isPresent():
             fn(self.get())
 
     def map(self, fn):
+        """
+        Maps the element of the source Option using the argument function.
+        :param fn: A function that maps the source vaue if present to a value.
+        :return: An Option that either contains the mapped value, or is empty.
+        """
         if self.isPresent():
             return Option(fn(self.get()))
         else:
             return self
         
     def orElse(self, val):
+        """
+        Coerces the Option to a value if it is present, or returns the default supplied value.
+        :param val: The default value to use if the Option does not contain a value.
+        :return: The optional value if it is present, or else the default value.
+        """
         if self.isPresent():
             return self.get()
         else:
             return val
 
     def filter(self, fn):
+        """
+        Filters the Option using the argument function, retaining the value if the function returns true.
+        :param fn: A Function that filtesr the Option (assigns a boolean value).
+        :return: An option that either contains the Option value or contains None
+        """
         if self.isPresent() and fn(self.get()):
             return Option(self.get())
         else:
@@ -34,6 +74,10 @@ class Option:
 
 
 class Vector:
+    """
+    Functional interface for a list.
+    """
+
     def __init__(self, *args):
         self.__data = list(args)
     
@@ -43,6 +87,9 @@ class Vector:
     def __setitem__(self, index, val):
         self.__data[index] = val
 
+    def __len__(self):
+        return len(self.__data)
+
     @staticmethod
     def __getElementsAt(index, args):
         ans = []
@@ -51,28 +98,60 @@ class Vector:
         return ans
 
     @staticmethod
-    def fromArray(array):
-        return Vector(*array)
+    def fromList(list):
+        """
+        Constructs a Vector from an argument list.
+        :param list: The list to construct the Vector from.
+        """
+        return Vector(*list)
 
     def getList(self):
+        """
+        Get the list underlying the Vector.
+        :return: The Vector's underlying list.
+        """
         return self.__data
 
     def forEach(self, fn, *args):
+        """
+        Perform the argument consumer function on each element in the Vector, and any additional argument Vectors.
+        :param fn: A function that uses a/an element/s from this Vector and any additional supplied Vectors.
+        :param *args: A variable number of additional Vectors to supply to the argument function for each enumeration.
+        :return: Void
+        """
         for index, val in enumerate(self.__data):
             fn(val, *self.__getElementsAt(index, args))
 
     def map(self, fn, *args):
+        """
+        Map the element/s from the source Vector and/or additional supplied Vectors using the argument consumer function.
+        :param fn: A Function that maps elements from the source Vector and/or additional argument Vectors.
+        :param *args: A variable number of additional Vectors to supply to the argument function for each enumeration.
+        """
         ans = []
         for index, val in enumerate(self.__data):
             ans.append(fn(val, *self.__getElementsAt(index, args)))
         return Vector(*ans)
 
     def fold(self, fn, carry = 0, *args):
+        """
+        Applies the argument function to each element in the source (and/or additional supplied vectors) and supplies the result to the next element.
+        :param fn: A function that accepts a 'carried' value from the prior evaluation of the function, and elements from the source vector and any additional vectors
+        :param carry: The initial value to invoke the argument function with.
+        :param *args: Any additional Vectors to apply the fold to.
+        :return: The final value calculated by the argument function.
+        """
         for index, val in enumerate(self.__data):
             carry = fn(carry, val, *self.__getElementsAt(index, args))
         return carry
 
     def filter(self, fn, *args):
+        """
+        Filters the elements of the source Vector (and/or additional supplied vectors)
+        :param fn: A function to use to filter the vector with parameters corresponding to the elements from the source Vector and/or additional vectors
+        :param *args: Any additional Vectors to use when applying the filter.
+        :return: A Vector that filtesr the elements from the source vector.
+        """
         ans = []
         for index, val in enumerate(self.__data):
             if fn(val, *self.__getElementsAt(index, args)):
@@ -80,6 +159,9 @@ class Vector:
         return Vector(*ans)
 
     def toString(self):
+        """
+        :return: A String representation of the Vector.
+        """
         ans = ""
         for val in self.__data:
             ans += "{} ".format(val)
@@ -124,8 +206,8 @@ class TestVector(unittest.TestCase):
         v[0] = 100
         self.assertEqual(v[0], 100)
 
-    def test_fromArray(self):
-        self.assertListEqual(Vector.fromArray([1,2,3]).getList(), [1,2,3])
+    def test_fromList(self):
+        self.assertListEqual(Vector.fromList([1,2,3]).getList(), [1,2,3])
 
     def test_forEach(self):
         class Iter:
