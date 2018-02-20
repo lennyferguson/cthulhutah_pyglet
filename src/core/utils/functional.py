@@ -91,7 +91,7 @@ class Vector:
         return len(self.__data)
 
     @staticmethod
-    def __getElementsAt(index, args):
+    def _getElementsAt(index, args):
         ans = []
         for arg in args:
             ans.append(arg[index])
@@ -120,7 +120,7 @@ class Vector:
         :return: Void
         """
         for index, val in enumerate(self.__data):
-            fn(val, *self.__getElementsAt(index, args))
+            fn(val, *self._getElementsAt(index, args))
 
     def map(self, fn, *args):
         """
@@ -130,7 +130,7 @@ class Vector:
         """
         ans = []
         for index, val in enumerate(self.__data):
-            ans.append(fn(val, *self.__getElementsAt(index, args)))
+            ans.append(fn(val, *self._getElementsAt(index, args)))
         return Vector(*ans)
 
     def fold(self, fn, carry = 0, *args):
@@ -142,7 +142,7 @@ class Vector:
         :return: The final value calculated by the argument function.
         """
         for index, val in enumerate(self.__data):
-            carry = fn(carry, val, *self.__getElementsAt(index, args))
+            carry = fn(carry, val, *self._getElementsAt(index, args))
         return carry
 
     def filter(self, fn, *args):
@@ -154,7 +154,7 @@ class Vector:
         """
         ans = []
         for index, val in enumerate(self.__data):
-            if fn(val, *self.__getElementsAt(index, args)):
+            if fn(val, *self._getElementsAt(index, args)):
                 ans.append(val)
         return Vector(*ans)
 
